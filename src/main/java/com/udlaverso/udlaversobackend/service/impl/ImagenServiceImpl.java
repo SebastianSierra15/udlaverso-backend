@@ -25,7 +25,7 @@ public class ImagenServiceImpl implements ImagenService {
     @Override
     @Transactional(readOnly = true)
     public List<ImagenDTO> listarPorProyecto(Integer idProyecto) {
-        List<Imagen> imagenes = imagenRepo.findByProyecto_IdProyecto(idProyecto);
+        List<Imagen> imagenes = imagenRepo.findByProyectoImagen_IdProyecto(idProyecto);
         return mapper.toDtoList(imagenes);
     }
 

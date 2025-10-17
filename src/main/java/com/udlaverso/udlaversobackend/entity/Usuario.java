@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
+@Data
 public class Usuario {
     @Id
     @Column(name = "id_usuario")

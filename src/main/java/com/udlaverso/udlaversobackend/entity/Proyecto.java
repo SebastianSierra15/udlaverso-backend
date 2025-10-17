@@ -49,6 +49,6 @@ public class Proyecto {
     @JoinColumn(name = "fk_id_categoria")
     private Categoria categoriaProyecto;
 
-    @OneToMany(mappedBy = "proyecto", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "proyectoImagen", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Imagen> imagenesProyecto = new ArrayList<>();
 }

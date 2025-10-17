@@ -51,9 +51,9 @@ public class ProyectoServiceImpl implements ProyectoService {
     public Page<ProyectoDTO> listar(String q, String categoria, Pageable pageable) {
         Page<Proyecto> page;
         if (categoria != null && !categoria.isBlank())
-            page = proyectoRepo.findByCategoria_NombreIgnoreCase(categoria, pageable);
+            page = proyectoRepo.findByCategoriaProyecto_NombreCategoriaIgnoreCase(categoria, pageable);
         else if (q != null && !q.isBlank())
-            page = proyectoRepo.findByNombreContainingIgnoreCase(q, pageable);
+            page = proyectoRepo.findByNombreProyectoContainingIgnoreCase(q, pageable);
         else
             page = proyectoRepo.findAll(pageable);
 

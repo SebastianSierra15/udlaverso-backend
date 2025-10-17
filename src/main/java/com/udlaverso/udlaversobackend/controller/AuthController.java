@@ -28,25 +28,25 @@ public class AuthController {
     public Map<String, String> login(@RequestBody Map<String, String> body) {
         Authentication auth = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(body.get("correo"), body.get("contrasenia")));
-        var user = usuarioRepo.findByCorreo(body.get("correo")).orElseThrow();
-        var role = user.getRol() != null ? user.getRol().getNombre() : "USER";
-        String token = jwt.generate(user.getCorreo(), role);
+        var user = usuarioRepo.findByCorreoUsuario(body.get("correo")).orElseThrow();
+        var role = user.getRolUsuario().getNombreRol() != null ? user.getRolUsuario().getNombreRol() : "USER";
+        String token = jwt.generate(user.getCorreoUsuario(), role);
         return Map.of("token", token, "role", role);
     }
 
     @PostMapping("/registro")
     public Map<String, Object> registro(@RequestBody Map<String, String> body) {
-        if (usuarioRepo.existsByCorreo(body.get("correo"))) throw new IllegalArgumentException("Correo ya usado");
+        if (usuarioRepo.existsByCorreoUsuario(body.get("correo"))) throw new IllegalArgumentException("Correo ya usado");
         var u = new Usuario();
-        u.setCorreo(body.get("correo"));
-        u.setContrasenia(encoder.encode(body.get("contrasenia")));
-        u.setNombres(body.get("nombres"));
-        u.setApellidos(body.get("apellidos"));
-        u.setUniversidad(body.get("universidad"));
-        u.setEstado((byte) 1);
-        u.setFechaCreacion(LocalDateTime.now());
-        rolRepo.findById(1).ifPresent(u::setRol); // asume 1=USER
+        u.setCorreoUsuario(body.get("correo"));
+        u.setContraseniaUsuario(encoder.encode(body.get("contrasenia")));
+        u.setNombresUsuario(body.get("nombres"));
+        u.setApellidosUsuario(body.get("apellidos"));
+        u.setUniversidadUsuario(body.get("universidad"));
+        u.setEstadoUsuario((byte) 1);
+        u.setFechacreacionUsuario(LocalDateTime.now());
+        rolRepo.findById(1).ifPresent(u::setRolUsuario); // asume 1=USER
         usuarioRepo.save(u);
-        return Map.of("id", u.getId(), "correo", u.getCorreo());
+        return Map.of("id", u.getIdUsuario(), "correo", u.getCorreoUsuario());
     }
 }

@@ -12,12 +12,16 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String correo) throws UsernameNotFoundException {
-        var u = usuarioRepo.findByCorreo(correo)
+        var u = usuarioRepo.findByCorreoUsuario(correo)
                 .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
-        var role = (u.getRol() != null && u.getRol().getNombre() != null) ? u.getRol().getNombre() : "USER";
-        return User.withUsername(u.getCorreo())
-                .password(u.getContrasenia())
-                .roles(role) // convierte a ROLE_{role}
+
+        String role = (u.getRolUsuario() != null && u.getRolUsuario().getNombreRol() != null)
+                ? u.getRolUsuario().getNombreRol()
+                : "USER";
+
+        return User.withUsername(u.getCorreoUsuario())
+                .password(u.getContraseniaUsuario())
+                .roles(role)
                 .build();
     }
 }
