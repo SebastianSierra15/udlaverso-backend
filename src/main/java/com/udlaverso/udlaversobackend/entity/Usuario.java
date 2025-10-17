@@ -14,27 +14,30 @@ public class Usuario {
     @Id
     @Column(name = "id_usuario")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer idUsuario;
 
     @Column(name = "correo_usuario", length = 150, unique = true, nullable = false)
-    private String correo;
+    private String correoUsuario;
 
     @Column(name = "contrasenia_usuario", length = 100, nullable = false)
-    private String contrasenia;
+    private String contraseniaUsuario;
 
     @Column(name = "nombres_usuario", length = 150)
-    private String nombres;
+    private String nombresUsuario;
+
     @Column(name = "apellidos_usuario", length = 150)
-    private String apellidos;
+    private String apellidosUsuario;
+
     @Column(name = "universidad_usuario", length = 100)
-    private String universidad;
+    private String universidadUsuario;
+
     @Column(name = "estado_usuario")
-    private Byte estado;
+    private Byte estadoUsuario;
 
     @Column(name = "fechacreacion_usuario")
-    private LocalDateTime fechaCreacion;
+    private LocalDateTime fechacreacionUsuario;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_id_rol")
-    private Rol rol;
+    private Rol rolUsuario;
 }

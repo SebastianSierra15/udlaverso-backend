@@ -11,11 +11,11 @@ import lombok.*;
 public class Rol {
     @Id
     @Column(name = "id_rol")
-    private Integer id;
+    private Integer idRol;
 
     @Column(name = "nombre_rol", length = 20)
-    private String nombre;
+    private String nombreRol;
 
     @Column(name = "estado_rol")
-    private Byte estado;
+    private Byte estadoRol;
 }

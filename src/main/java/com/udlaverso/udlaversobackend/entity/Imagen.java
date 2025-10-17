@@ -12,14 +12,15 @@ public class Imagen {
     @Id
     @Column(name = "id_imagen")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer idImagen;
 
     @Column(name = "ruta_imagen", length = 255)
-    private String ruta;
+    private String rutaImagen;
+
     @Column(name = "tipo_imagen", columnDefinition = "TEXT")
-    private String tipo;
+    private String tipoImagen;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_id_proyecto")
-    private Proyecto proyecto;
+    private Proyecto proyectoImagen;
 }

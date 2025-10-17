@@ -1,5 +1,7 @@
 package com.udlaverso.udlaversobackend.dto;
 
+import com.udlaverso.udlaversobackend.dto.ImagenDTO;
+
 import lombok.*;
 
 import java.time.LocalDate;
@@ -9,17 +11,17 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class ProyectoDTO {
-    private Integer id;
-    private String nombre;
-    private LocalDate fechaCreacion;
-    private String descripcionCorta;
-    private String descripcionLarga;
-    private String objetivo;
-    private String video;
-    private String autor;
-    private Integer visualizaciones;
-    private Byte estado;
+    private Integer idProyecto;
+    private String nombreProyecto;
+    private LocalDate fechacreacionProyecto;
+    private String descripcioncortaProyecto;
+    private String descripcionlargaProyecto;
+    private String objetivoProyecto;
+    private String videoProyecto;
+    private String autorProyecto;
+    private Integer visualizacionesProyecto;
+    private Byte estadoProyecto;
+    private List<ImagenDTO> imagenesProyecto;
     private Integer categoriaId;
     private String categoriaNombre;
-    private List<String> imagenes; // solo rutas
 }

@@ -12,11 +12,14 @@ public class Faq {
     @Id
     @Column(name = "id_faq")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer idFaq;
+
     @Column(name = "pregunta_faq", length = 255)
-    private String pregunta;
+    private String preguntaFaq;
+
     @Column(name = "respuesta_faq", length = 1000)
-    private String respuesta;
+    private String respuestaFaq;
+
     @Column(name = "estado_faq")
-    private Byte estado;
+    private Byte estadoFaq;
 }

@@ -12,20 +12,22 @@ public class Resenia {
     @Id
     @Column(name = "id_resenia")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer idResenia;
 
     @Column(name = "valoracion_resenia")
-    private Integer valoracion;
+    private Integer valoracionResenia;
+
     @Column(name = "comentario_resenia", length = 1000)
-    private String comentario;
+    private String comentarioResenia;
+
     @Column(name = "estado_resenia")
-    private Byte estado;
+    private Byte estadoResenia;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_id_proyecto")
-    private Proyecto proyecto;
+    private Proyecto proyectoResenia;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_id_usuario")
-    private Usuario usuario;
+    private Usuario usuarioResenia;
 }

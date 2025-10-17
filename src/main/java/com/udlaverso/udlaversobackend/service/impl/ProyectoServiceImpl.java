@@ -10,6 +10,8 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -22,12 +24,19 @@ public class ProyectoServiceImpl implements ProyectoService {
     @Override
     public ProyectoDTO crear(ProyectoDTO dto) {
         Proyecto entity = mapper.toEntity(dto);
+
         if (dto.getCategoriaId() != null) {
             Categoria cat = categoriaRepo.findById(dto.getCategoriaId())
                     .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
-            entity.setCategoria(cat);
+            entity.setCategoriaProyecto(cat);
         }
-        return mapper.toDto(proyectoRepo.save(entity));
+
+        entity.setFechacreacionProyecto(LocalDate.now());
+        entity.setVisualizacionesProyecto(0);
+        entity.setEstadoProyecto((byte) 1);
+
+        Proyecto guardado = proyectoRepo.save(entity);
+        return mapper.toDto(guardado);
     }
 
     @Override
@@ -57,19 +66,19 @@ public class ProyectoServiceImpl implements ProyectoService {
                 .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
         Proyecto cambios = mapper.toEntity(dto);
 
-        actual.setNombre(cambios.getNombre());
-        actual.setDescripcionCorta(cambios.getDescripcionCorta());
-        actual.setDescripcionLarga(cambios.getDescripcionLarga());
-        actual.setObjetivo(cambios.getObjetivo());
-        actual.setVideo(cambios.getVideo());
-        actual.setAutor(cambios.getAutor());
-        actual.setVisualizaciones(cambios.getVisualizaciones());
-        actual.setEstado(cambios.getEstado());
+        actual.setNombreProyecto(cambios.getNombreProyecto());
+        actual.setDescripcioncortaProyecto(cambios.getDescripcioncortaProyecto());
+        actual.setDescripcionlargaProyecto(cambios.getDescripcionlargaProyecto());
+        actual.setObjetivoProyecto(cambios.getObjetivoProyecto());
+        actual.setVideoProyecto(cambios.getVideoProyecto());
+        actual.setAutorProyecto(cambios.getAutorProyecto());
+        actual.setVisualizacionesProyecto(cambios.getVisualizacionesProyecto());
+        actual.setEstadoProyecto(cambios.getEstadoProyecto());
 
         if (dto.getCategoriaId() != null) {
             Categoria cat = categoriaRepo.findById(dto.getCategoriaId())
                     .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
-            actual.setCategoria(cat);
+            actual.setCategoriaProyecto(cat);
         }
         return mapper.toDto(actual);
     }

@@ -11,22 +11,11 @@ import java.util.stream.Collectors;
 @Mapper(componentModel = "spring")
 public interface ProyectoMapper {
 
-    @Mapping(source = "categoria.id", target = "categoriaId")
-    @Mapping(source = "categoria.nombre", target = "categoriaNombre")
-    @Mapping(target = "imagenes", expression = "java(mapImagenes(proyecto))")
+    @Mapping(source = "categoriaProyecto.idCategoria", target = "categoriaId")
+    @Mapping(source = "categoriaProyecto.nombreCategoria", target = "categoriaNombre")
     ProyectoDTO toDto(Proyecto proyecto);
 
     @InheritInverseConfiguration
-    @Mapping(target = "categoria", ignore = true)
-    @Mapping(target = "imagenes", ignore = true)
+    @Mapping(target = "categoriaProyecto", ignore = true)
     Proyecto toEntity(ProyectoDTO dto);
-
-    // ✅ Método auxiliar usado en la expresión
-    default List<String> mapImagenes(Proyecto proyecto) {
-        if (proyecto == null || proyecto.getImagenes() == null)
-            return Collections.emptyList();
-        return proyecto.getImagenes().stream()
-                .map(img -> img.getRuta())
-                .collect(Collectors.toList());
-    }
 }

@@ -14,15 +14,20 @@ public class Noticia {
     @Id
     @Column(name = "id_noticia")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Integer idNoticia;
+
     @Column(name = "titulo_noticia", length = 255)
-    private String titulo;
+    private String tituloNoticia;
+
     @Column(name = "contenido_noticia", length = 1500)
-    private String contenido;
+    private String contenidoNoticia;
+
     @Column(name = "fechapublicacion_noticia")
-    private LocalDateTime fechaPublicacion;
+    private LocalDateTime fechapublicacionNoticia;
+
     @Column(name = "imagen_noticia", length = 255)
-    private String imagen;
+    private String imagenNoticia;
+
     @Column(name = "estado_noticia")
-    private Byte estado;
+    private Byte estadoNoticia;
 }
