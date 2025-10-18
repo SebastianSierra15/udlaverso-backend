@@ -7,6 +7,8 @@ import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+
 @RestController
 @RequestMapping("/proyectos")
 @RequiredArgsConstructor
@@ -25,16 +27,20 @@ public class ProyectoController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<ProyectoDTO>> listar(
+    public ResponseEntity<Object> listar(
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String categoria,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "id,desc") String sort
+            @RequestParam(defaultValue = "idProyecto,desc") String sort
     ) {
         String[] s = sort.split(",");
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(s[1]), s[0]));
-        return ResponseEntity.ok(servicio.listar(q, categoria, pageable));
+        Page<ProyectoDTO> proyectosPage = servicio.listar(q, categoria, pageable);
+
+        return ResponseEntity.ok(
+                Collections.singletonMap("content", proyectosPage.getContent())
+        );
     }
 
     @PutMapping("/{id}")

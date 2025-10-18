@@ -45,7 +45,7 @@ public class Proyecto {
     @Column(name = "estado_proyecto")
     private Byte estadoProyecto;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "fk_id_categoria")
     private Categoria categoriaProyecto;
 
