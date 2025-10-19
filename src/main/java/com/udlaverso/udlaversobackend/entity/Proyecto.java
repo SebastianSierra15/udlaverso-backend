@@ -1,5 +1,6 @@
 package com.udlaverso.udlaversobackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,6 +34,12 @@ public class Proyecto {
     @Column(name = "objetivo_proyecto", length = 255)
     private String objetivoProyecto;
 
+    @Column(name = "herramientas_proyecto", length = 255)
+    private String herramientasProyecto;
+
+    @Column(name = "palabrasclave_proyecto", length = 255)
+    private String palabrasclaveProyecto;
+
     @Column(name = "video_proyecto", length = 255)
     private String videoProyecto;
 
@@ -51,4 +58,8 @@ public class Proyecto {
 
     @OneToMany(mappedBy = "proyectoImagen", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Imagen> imagenesProyecto = new ArrayList<>();
+
+    @OneToMany(mappedBy = "proyectoResenia", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Resenia> reseniasProyecto = new ArrayList<>();
 }

@@ -1,7 +1,10 @@
 package com.udlaverso.udlaversobackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "resenia")
@@ -20,6 +23,9 @@ public class Resenia {
     @Column(name = "comentario_resenia", length = 1000)
     private String comentarioResenia;
 
+    @Column(name = "fecha_resenia", updatable = false, insertable = false)
+    private LocalDateTime fechaResenia;
+
     @Column(name = "estado_resenia")
     private Byte estadoResenia;
 
@@ -29,5 +35,6 @@ public class Resenia {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "fk_id_usuario")
+    @JsonManagedReference
     private Usuario usuarioResenia;
 }

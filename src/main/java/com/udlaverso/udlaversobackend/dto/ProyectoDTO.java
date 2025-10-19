@@ -1,6 +1,7 @@
 package com.udlaverso.udlaversobackend.dto;
 
 import com.udlaverso.udlaversobackend.dto.ImagenDTO;
+import com.udlaverso.udlaversobackend.dto.ReseniaDTO;
 
 import lombok.*;
 
@@ -17,6 +18,8 @@ public class ProyectoDTO {
     private String descripcioncortaProyecto;
     private String descripcionlargaProyecto;
     private String objetivoProyecto;
+    private String herramientasProyecto;
+    private String palabrasclaveProyecto;
     private String videoProyecto;
     private String autorProyecto;
     private Integer visualizacionesProyecto;
@@ -24,4 +27,5 @@ public class ProyectoDTO {
     private List<ImagenDTO> imagenesProyecto;
     private Integer categoriaId;
     private String categoriaNombre;
+    private List<ReseniaDTO> resenias;
 }

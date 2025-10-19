@@ -27,6 +27,11 @@ public class ProyectoController {
         return ResponseEntity.ok(servicio.obtener(id));
     }
 
+    @GetMapping("/nombre/{nombre}")
+    public ResponseEntity<ProyectoDTO> obtenerPorNombre(@PathVariable String nombre) {
+        return ResponseEntity.ok(servicio.obtenerPorNombre(nombre));
+    }
+
     @GetMapping
     public ResponseEntity<Object> listar(
             @RequestParam(required = false) String q,

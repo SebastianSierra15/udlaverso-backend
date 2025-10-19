@@ -7,12 +7,12 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @Component
-public class JwtAuthFilter extends GenericFilter {
-
+public class JwtAuthFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwt;
     private final UserDetailsService uds;
 
@@ -22,13 +22,13 @@ public class JwtAuthFilter extends GenericFilter {
     }
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
+            throws ServletException, IOException {
 
-        HttpServletRequest req = (HttpServletRequest) request;
         String uri = req.getRequestURI();
+        System.out.println("🔎 URI actual: " + uri);
 
-        // Si la ruta es pública, no validar token
+        // Rutas públicas
         if (uri.startsWith("/proyectos") ||
                 uri.startsWith("/categorias") ||
                 uri.startsWith("/auth") ||
@@ -36,14 +36,14 @@ public class JwtAuthFilter extends GenericFilter {
                 uri.startsWith("/faqs") ||
                 uri.startsWith("/swagger-ui") ||
                 uri.startsWith("/v3/api-docs")) {
-            chain.doFilter(request, response);
+            chain.doFilter(req, res);
             return;
         }
 
-        // Si no hay header Authorization, seguir sin autenticar
+        // Si hay token, validarlo
         String header = req.getHeader("Authorization");
         if (!StringUtils.hasText(header) || !header.startsWith("Bearer ")) {
-            chain.doFilter(request, response);
+            chain.doFilter(req, res);
             return;
         }
 
@@ -62,6 +62,6 @@ public class JwtAuthFilter extends GenericFilter {
             SecurityContextHolder.clearContext();
         }
 
-        chain.doFilter(request, response);
+        chain.doFilter(req, res);
     }
 }

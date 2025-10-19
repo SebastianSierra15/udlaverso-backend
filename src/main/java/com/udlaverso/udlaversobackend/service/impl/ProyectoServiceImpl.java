@@ -49,6 +49,15 @@ public class ProyectoServiceImpl implements ProyectoService {
 
     @Override
     @Transactional(readOnly = true)
+    public ProyectoDTO obtenerPorNombre(String slug) {
+        Proyecto proyecto = proyectoRepo
+                .findBySlugConResenias(slug)
+                .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
+        return mapper.toDto(proyecto);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Page<ProyectoDTO> listar(String q, String categoria, Pageable pageable) {
         Page<Proyecto> page;
         if (categoria != null && !categoria.isBlank())

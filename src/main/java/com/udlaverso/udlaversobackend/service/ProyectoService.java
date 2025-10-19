@@ -10,6 +10,8 @@ public interface ProyectoService {
 
     ProyectoDTO obtener(Integer id);
 
+    ProyectoDTO obtenerPorNombre(String nombre);
+
     Page<ProyectoDTO> listar(String q, String categoria, Pageable pageable);
 
     List<ProyectoDTO> listarMasVistos(int limite);
