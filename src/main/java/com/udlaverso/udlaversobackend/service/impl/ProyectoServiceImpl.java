@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -58,6 +59,12 @@ public class ProyectoServiceImpl implements ProyectoService {
             page = proyectoRepo.findAll(pageable);
 
         return page.map(mapper::toDto);
+    }
+
+    @Override
+    public List<ProyectoDTO> listarMasVistos(int limite) {
+        var proyectos = proyectoRepo.findTopProyectosMasVistos(PageRequest.of(0, limite));
+        return proyectos.stream().map(mapper::toDto).toList();
     }
 
     @Override

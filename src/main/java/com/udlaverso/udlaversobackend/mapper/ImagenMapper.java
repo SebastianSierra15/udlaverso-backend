@@ -2,7 +2,7 @@ package com.udlaverso.udlaversobackend.mapper;
 
 import com.udlaverso.udlaversobackend.dto.ImagenDTO;
 import com.udlaverso.udlaversobackend.entity.Imagen;
-import org.mapstruct.Mapper;
+import org.mapstruct.*;
 
 import java.util.List;
 

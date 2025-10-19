@@ -4,10 +4,6 @@ import com.udlaverso.udlaversobackend.dto.ProyectoDTO;
 import com.udlaverso.udlaversobackend.entity.Proyecto;
 import org.mapstruct.*;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
-
 @Mapper(componentModel = "spring")
 public interface ProyectoMapper {
 

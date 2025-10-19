@@ -25,6 +25,9 @@ public class Noticia {
     @Column(name = "fechapublicacion_noticia")
     private LocalDateTime fechapublicacionNoticia;
 
+    @Column(name = "autor_noticia", length = 150)
+    private String autorNoticia;
+
     @Column(name = "imagen_noticia", length = 255)
     private String imagenNoticia;
 

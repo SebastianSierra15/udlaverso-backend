@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
+import java.util.List;
 
 @RestController
 @RequestMapping("/proyectos")
@@ -41,6 +42,12 @@ public class ProyectoController {
         return ResponseEntity.ok(
                 Collections.singletonMap("content", proyectosPage.getContent())
         );
+    }
+
+    @GetMapping("/mas-vistos")
+    public ResponseEntity<List<ProyectoDTO>> listarMasVistos(
+            @RequestParam(defaultValue = "10") int limite) {
+        return ResponseEntity.ok(servicio.listarMasVistos(limite));
     }
 
     @PutMapping("/{id}")
