@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.UUID;
 
 @Component
 public class JwtTokenProvider {
@@ -29,6 +30,8 @@ public class JwtTokenProvider {
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + expirationMs))
                 .signWith(key, SignatureAlgorithm.HS256)
+                .setIssuer("UdlaVerso")
+                .setId(UUID.randomUUID().toString())
                 .compact();
     }
 
@@ -36,4 +39,23 @@ public class JwtTokenProvider {
         return Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token).getBody().getSubject();
     }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            System.err.println("Token expirado");
+        } catch (UnsupportedJwtException e) {
+            System.err.println("Token no soportado");
+        } catch (MalformedJwtException e) {
+            System.err.println("Token malformado");
+        } catch (SignatureException e) {
+            System.err.println("Firma JWT inválida");
+        } catch (IllegalArgumentException e) {
+            System.err.println("Token vacío o nulo");
+        }
+        return false;
+    }
+
 }
