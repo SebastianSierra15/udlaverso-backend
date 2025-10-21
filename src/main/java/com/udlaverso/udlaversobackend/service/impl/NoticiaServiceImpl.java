@@ -6,6 +6,10 @@ import com.udlaverso.udlaversobackend.mapper.NoticiaMapper;
 import com.udlaverso.udlaversobackend.repository.NoticiaRepository;
 import com.udlaverso.udlaversobackend.service.NoticiaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,8 +23,26 @@ public class NoticiaServiceImpl implements NoticiaService {
     private final NoticiaMapper mapper;
 
     @Override
-    public List<NoticiaDTO> listar() {
-        return repo.findAll().stream().map(mapper::toDTO).toList();
+    public Page<NoticiaDTO> listar(String q, Pageable pageable) {
+        Page<Noticia> page;
+
+        if (q != null && !q.isBlank())
+            page = repo.findByTituloNoticiaContainingIgnoreCase(q, pageable);
+        else
+            page = repo.findAll(pageable);
+
+        return page.map(mapper::toDTO);
+    }
+
+    @Override
+    public List<NoticiaDTO> listarRecientes() {
+        // Obtiene las últimas 6 noticias ordenadas por fecha DESC
+        Pageable topSix = PageRequest.of(0, 6, Sort.by("fechapublicacionNoticia").descending());
+        return repo.findAll(topSix)
+                .getContent()
+                .stream()
+                .map(mapper::toDTO)
+                .toList();
     }
 
     @Override

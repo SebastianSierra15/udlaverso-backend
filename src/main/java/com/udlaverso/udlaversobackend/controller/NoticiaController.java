@@ -3,9 +3,14 @@ package com.udlaverso.udlaversobackend.controller;
 import com.udlaverso.udlaversobackend.dto.NoticiaDTO;
 import com.udlaverso.udlaversobackend.service.NoticiaService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/noticias")
@@ -15,8 +20,27 @@ public class NoticiaController {
     private final NoticiaService servicio;
 
     @GetMapping
-    public List<NoticiaDTO> listar() {
-        return servicio.listar();
+    public ResponseEntity<Object> listar(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String q
+    ) {
+        Page<NoticiaDTO> noticiasPage = servicio.listar(q, PageRequest.of(page, size));
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "content", noticiasPage.getContent(),
+                        "total", noticiasPage.getTotalElements(),
+                        "page", noticiasPage.getNumber(),
+                        "pages", noticiasPage.getTotalPages()
+                )
+        );
+    }
+
+    @GetMapping("/recientes")
+    public ResponseEntity<Object> listarRecientes() {
+        List<NoticiaDTO> recientes = servicio.listarRecientes();
+        return ResponseEntity.ok(recientes);
     }
 
     @GetMapping("/{id}")

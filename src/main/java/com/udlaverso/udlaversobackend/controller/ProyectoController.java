@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/proyectos")
@@ -37,7 +38,7 @@ public class ProyectoController {
             @RequestParam(required = false) String q,
             @RequestParam(required = false) String categoria,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "5") int size,
             @RequestParam(defaultValue = "idProyecto,desc") String sort
     ) {
         String[] s = sort.split(",");
@@ -45,7 +46,12 @@ public class ProyectoController {
         Page<ProyectoDTO> proyectosPage = servicio.listar(q, categoria, pageable);
 
         return ResponseEntity.ok(
-                Collections.singletonMap("content", proyectosPage.getContent())
+                Map.of(
+                        "content", proyectosPage.getContent(),
+                        "total", proyectosPage.getTotalElements(),
+                        "page", proyectosPage.getNumber(),
+                        "pages", proyectosPage.getTotalPages()
+                )
         );
     }
 
