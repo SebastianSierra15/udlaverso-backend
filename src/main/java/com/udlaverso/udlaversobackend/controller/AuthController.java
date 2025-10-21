@@ -1,5 +1,6 @@
 package com.udlaverso.udlaversobackend.controller;
 
+import com.udlaverso.udlaversobackend.entity.Permiso;
 import com.udlaverso.udlaversobackend.repository.UsuarioRepository;
 import com.udlaverso.udlaversobackend.repository.RolRepository;
 import com.udlaverso.udlaversobackend.security.JwtTokenProvider;
@@ -28,13 +29,26 @@ public class AuthController {
     private final PasswordEncoder encoder;
 
     @PostMapping("/login")
-    public Map<String, String> login(@RequestBody Map<String, String> body) {
+    public Map<String, Object> login(@RequestBody Map<String, String> body) {
         Authentication auth = authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(body.get("correo"), body.get("contrasenia")));
         var user = usuarioRepo.findByCorreoUsuario(body.get("correo")).orElseThrow();
         var role = user.getRolUsuario().getNombreRol() != null ? user.getRolUsuario().getNombreRol() : "USER";
+
+        // 🧩 Agrega esto:
+        System.out.println("===== LOGIN DEBUG =====");
+        System.out.println("Usuario: " + user.getCorreoUsuario());
+        System.out.println("Rol: " + role);
+        System.out.println("Permisos cargados: " + user.getRolUsuario().getPermisosRol());
+        System.out.println("========================");
+
+        var permisos = user.getRolUsuario().getPermisosRol()
+                .stream()
+                .map(Permiso::getNombrePermiso)
+                .toList();
+
         String token = jwt.generate(user.getCorreoUsuario(), role);
-        return Map.of("token", token, "role", role);
+        return Map.of("token", token, "role", role, "permissions", permisos);
     }
 
     @PostMapping("/registro")

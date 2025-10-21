@@ -1,16 +1,25 @@
 package com.udlaverso.udlaversobackend.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Entity
+@Table(name = "permiso")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Permiso {
+
     @Id
-    @Column(name = "id_permiso")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_permiso")
     private Integer idPermiso;
 
-    @Column(name = "nombre_permiso", length = 50)
+    @Column(name = "nombre_permiso", length = 50, nullable = false, unique = true)
     private String nombrePermiso;
+
+    @Column(name = "estado_permiso")
+    private Byte estadoPermiso;
 }
