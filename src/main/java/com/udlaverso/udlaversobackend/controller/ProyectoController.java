@@ -39,7 +39,7 @@ public class ProyectoController {
             @RequestParam(required = false) String categoria,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(defaultValue = "idProyecto,desc") String sort
+            @RequestParam(defaultValue = "visualizacionesProyecto,desc") String sort
     ) {
         String[] s = sort.split(",");
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(s[1]), s[0]));

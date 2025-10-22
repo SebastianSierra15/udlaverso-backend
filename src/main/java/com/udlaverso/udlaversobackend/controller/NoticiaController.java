@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,9 +24,14 @@ public class NoticiaController {
     public ResponseEntity<Object> listar(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "5") int size,
-            @RequestParam(required = false) String q
+            @RequestParam(required = false) String q,
+            @RequestParam(defaultValue = "desc") String orden
     ) {
-        Page<NoticiaDTO> noticiasPage = servicio.listar(q, PageRequest.of(page, size));
+        Sort sort = orden.equalsIgnoreCase("asc")
+                ? Sort.by("fechapublicacionNoticia").ascending()
+                : Sort.by("fechapublicacionNoticia").descending();
+
+        Page<NoticiaDTO> noticiasPage = servicio.listar(q, PageRequest.of(page, size, sort));
 
         return ResponseEntity.ok(
                 Map.of(
