@@ -27,5 +27,6 @@ public class ProyectoDTO {
     private List<ImagenDTO> imagenesProyecto;
     private Integer categoriaId;
     private String categoriaNombre;
+    private Double valoracionPromedio;
     private List<ReseniaDTO> resenias;
 }

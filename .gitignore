@@ -31,3 +31,25 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Logs & Temp files ###
+logs/
+*.log
+*.tmp
+*.bak
+*.swp
+
+### Environment / Secrets ###
+# Evita subir credenciales sensibles
+src/main/resources/application.properties
+src/main/resources/application.yml
+src/main/resources/application.yaml
+
+# Archivos de configuración local (variables de entorno, etc.)
+.env
+*.env
+.env.*
+
+### OS / Misc ###
+.DS_Store
+Thumbs.db

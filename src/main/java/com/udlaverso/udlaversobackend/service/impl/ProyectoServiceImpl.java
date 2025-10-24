@@ -53,7 +53,21 @@ public class ProyectoServiceImpl implements ProyectoService {
         Proyecto proyecto = proyectoRepo
                 .findBySlugConResenias(slug)
                 .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
-        return mapper.toDto(proyecto);
+
+        ProyectoDTO dto = mapper.toDto(proyecto);
+
+        // Calcular el promedio de valoracion
+        if (proyecto.getReseniasProyecto() != null && !proyecto.getReseniasProyecto().isEmpty()) {
+            double promedio = proyecto.getReseniasProyecto().stream()
+                    .mapToDouble(r -> r.getValoracionResenia())
+                    .average()
+                    .orElse(0.0);
+            dto.setValoracionPromedio(promedio);
+        } else {
+            dto.setValoracionPromedio(0.0);
+        }
+
+        return dto;
     }
 
     @Override
@@ -67,7 +81,20 @@ public class ProyectoServiceImpl implements ProyectoService {
         else
             page = proyectoRepo.findAll(pageable);
 
-        return page.map(mapper::toDto);
+        return page.map(proyecto -> {
+            ProyectoDTO dto = mapper.toDto(proyecto);
+            // Calcular el promedio de valoracion
+            if (proyecto.getReseniasProyecto() != null && !proyecto.getReseniasProyecto().isEmpty()) {
+                double promedio = proyecto.getReseniasProyecto().stream()
+                        .mapToDouble(r -> r.getValoracionResenia())
+                        .average()
+                        .orElse(0.0);
+                dto.setValoracionPromedio(promedio);
+            } else {
+                dto.setValoracionPromedio(0.0);
+            }
+            return dto;
+        });
     }
 
     @Override

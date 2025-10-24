@@ -13,6 +13,8 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import com.udlaverso.udlaversobackend.service.VerificacionCorreoService;
+import com.udlaverso.udlaversobackend.repository.VerificacionCorreoRepository;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -27,6 +29,8 @@ public class AuthController {
     private final UsuarioRepository usuarioRepo;
     private final RolRepository rolRepo;
     private final PasswordEncoder encoder;
+    private final VerificacionCorreoService verificacionCorreoService;
+    private final VerificacionCorreoRepository verificacionCorreoRepo;
 
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody Map<String, String> body) {
@@ -57,6 +61,14 @@ public class AuthController {
             return ResponseEntity.badRequest().body(Map.of("error", "El correo ya está registrado"));
         }
 
+
+        var verificacion = verificacionCorreoRepo.findTopByCorreoVerificacionCorreoAndTipoVerificacionCorreoOrderByExpiracionVerificacionCorreoDesc(
+                dto.getCorreoUsuario(), "registro"
+        );
+        if (verificacion.isEmpty() || !verificacion.get().isVerificadoVerificacionCorreo()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Debe verificar su correo antes de registrarse"));
+        }
+
         var nuevoUsuario = new Usuario();
         nuevoUsuario.setNombresUsuario(dto.getNombresUsuario());
         nuevoUsuario.setApellidosUsuario(dto.getApellidosUsuario());
@@ -80,5 +92,42 @@ public class AuthController {
                 "mensaje", "Usuario registrado correctamente",
                 "correo", nuevoUsuario.getCorreoUsuario()
         ));
+    }
+
+    @PostMapping("/enviar-codigo")
+    public ResponseEntity<?> enviarCodigo(@RequestBody Map<String, String> body) {
+        String correo = body.get("correo");
+        String tipo = body.getOrDefault("tipo", "registro");
+        verificacionCorreoService.enviarCodigo(correo, tipo);
+        return ResponseEntity.ok(Map.of("mensaje", "Código enviado al correo."));
+    }
+
+    @PostMapping("/verificar-codigo")
+    public ResponseEntity<?> verificarCodigo(@RequestBody Map<String, String> body) {
+        String correo = body.get("correo");
+        String codigo = body.get("codigo");
+        String tipo = body.getOrDefault("tipo", "registro");
+        boolean valido = verificacionCorreoService.verificarCodigo(correo, codigo, tipo);
+        if (!valido)
+            return ResponseEntity.badRequest().body(Map.of("error", "Código inválido o expirado"));
+        return ResponseEntity.ok(Map.of("mensaje", "Código verificado correctamente"));
+    }
+
+    @PostMapping("/restablecer-contrasenia")
+    public ResponseEntity<?> restablecerContrasenia(@RequestBody Map<String, String> body) {
+        String correo = body.get("correo");
+        String codigo = body.get("codigo");
+        String nueva = body.get("nuevaContrasenia");
+
+        boolean valido = verificacionCorreoService.verificarCodigo(correo, codigo, "recuperacion");
+        if (!valido)
+            return ResponseEntity.badRequest().body(Map.of("error", "Código inválido o expirado"));
+
+        var usuario = usuarioRepo.findByCorreoUsuario(correo)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        usuario.setContraseniaUsuario(encoder.encode(nueva));
+        usuarioRepo.save(usuario);
+
+        return ResponseEntity.ok(Map.of("mensaje", "Contraseña restablecida correctamente"));
     }
 }
