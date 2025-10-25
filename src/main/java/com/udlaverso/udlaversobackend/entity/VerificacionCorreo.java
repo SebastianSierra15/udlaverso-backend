@@ -22,6 +22,15 @@ public class VerificacionCorreo {
     @Column(name = "codigo_verificacioncorreo")
     private String codigoVerificacionCorreo;
 
+    @Column(name = "intentos_verificacioncorreo")
+    private int intentosVerificacionCorreo;
+
+    @Column(name = "bloqueohasta_verificacioncorreo")
+    private LocalDateTime bloqueoHastaVerificacionCorreo;
+
+    @Column(name = "fechacreacion_verificacioncorreo")
+    private LocalDateTime fechacreacionVerificacionCorreo;
+
     @Column(name = "expiracion_verificacioncorreo")
     private LocalDateTime expiracionVerificacionCorreo;
 

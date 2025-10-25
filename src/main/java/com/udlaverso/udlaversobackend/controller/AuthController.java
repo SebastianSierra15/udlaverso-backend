@@ -98,8 +98,29 @@ public class AuthController {
     public ResponseEntity<?> enviarCodigo(@RequestBody Map<String, String> body) {
         String correo = body.get("correo");
         String tipo = body.getOrDefault("tipo", "registro");
-        verificacionCorreoService.enviarCodigo(correo, tipo);
-        return ResponseEntity.ok(Map.of("mensaje", "Código enviado al correo."));
+
+        try {
+            if ("registro".equalsIgnoreCase(tipo)) {
+                if (usuarioRepo.existsByCorreoUsuario(correo)) {
+                    return ResponseEntity.badRequest().body(
+                            Map.of("error", "El correo ya está registrado. No puedes crear otra cuenta con este correo.")
+                    );
+                }
+            } else if ("recuperacion".equalsIgnoreCase(tipo)) {
+                if (!usuarioRepo.existsByCorreoUsuario(correo)) {
+                    return ResponseEntity.badRequest().body(
+                            Map.of("error", "No existe ninguna cuenta asociada a este correo.")
+                    );
+                }
+            }
+
+            verificacionCorreoService.enviarCodigo(correo, tipo);
+            return ResponseEntity.ok(Map.of("mensaje", "Código enviado al correo."));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(Map.of("error", "Error interno del servidor"));
+        }
     }
 
     @PostMapping("/verificar-codigo")
@@ -116,18 +137,27 @@ public class AuthController {
     @PostMapping("/restablecer-contrasenia")
     public ResponseEntity<?> restablecerContrasenia(@RequestBody Map<String, String> body) {
         String correo = body.get("correo");
-        String codigo = body.get("codigo");
         String nueva = body.get("nuevaContrasenia");
 
-        boolean valido = verificacionCorreoService.verificarCodigo(correo, codigo, "recuperacion");
-        if (!valido)
-            return ResponseEntity.badRequest().body(Map.of("error", "Código inválido o expirado"));
+        var verOpt = verificacionCorreoRepo.findTopByCorreoVerificacionCorreoAndTipoVerificacionCorreoOrderByExpiracionVerificacionCorreoDesc(correo, "recuperacion");
+
+        if (verOpt.isEmpty() || !verOpt.get().isVerificadoVerificacionCorreo()) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Debe verificar el código antes de restablecer la contraseña."));
+        }
+
+        var verificacion = verOpt.get();
+        if (verificacion.getExpiracionVerificacionCorreo().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "El código ha expirado."));
+        }
 
         var usuario = usuarioRepo.findByCorreoUsuario(correo)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         usuario.setContraseniaUsuario(encoder.encode(nueva));
         usuarioRepo.save(usuario);
 
-        return ResponseEntity.ok(Map.of("mensaje", "Contraseña restablecida correctamente"));
+        verificacion.setUsadoVerificacionCorreo(true);
+        verificacionCorreoRepo.save(verificacion);
+
+        return ResponseEntity.ok(Map.of("mensaje", "Contraseña restablecida correctamente."));
     }
 }
