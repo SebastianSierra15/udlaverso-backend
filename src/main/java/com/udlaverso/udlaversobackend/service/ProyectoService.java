@@ -2,11 +2,14 @@ package com.udlaverso.udlaversobackend.service;
 
 import com.udlaverso.udlaversobackend.dto.ProyectoDTO;
 import org.springframework.data.domain.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface ProyectoService {
     ProyectoDTO crear(ProyectoDTO dto);
+
+    ProyectoDTO crearConImagenes(ProyectoDTO dto, MultipartFile hero, List<MultipartFile> galeria);
 
     ProyectoDTO obtener(Integer id);
 

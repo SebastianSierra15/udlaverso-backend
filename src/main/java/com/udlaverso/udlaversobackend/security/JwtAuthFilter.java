@@ -26,25 +26,28 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String uri = req.getRequestURI();
-        System.out.println("🔎 URI actual: " + uri);
+        String method = req.getMethod();
+        System.out.println("🔎 URI actual: " + uri + " | Método: " + method);
 
-        // Rutas públicas
-        if (uri.startsWith("/proyectos") ||
-                uri.startsWith("/categorias") ||
-                uri.startsWith("/auth") ||
-                uri.startsWith("/noticias") ||
-                uri.startsWith("/faqs") ||
-                uri.startsWith("/swagger-ui") ||
-                uri.startsWith("/v3/api-docs") ||
-                uri.startsWith("/mail")) {
+        // === RUTAS PÚBLICAS (solo GET) ===
+        if (method.equalsIgnoreCase("GET") && (
+                uri.startsWith("/proyectos") ||
+                        uri.startsWith("/categorias") ||
+                        uri.startsWith("/noticias") ||
+                        uri.startsWith("/faqs") ||
+                        uri.startsWith("/uploads") ||
+                        uri.startsWith("/swagger-ui") ||
+                        uri.startsWith("/v3/api-docs")
+        ) || uri.startsWith("/auth") || uri.startsWith("/mail")) {
             chain.doFilter(req, res);
             return;
         }
 
-        // Si hay token, validarlo
+        // === VALIDACIÓN JWT ===
         String header = req.getHeader("Authorization");
         if (!StringUtils.hasText(header) || !header.startsWith("Bearer ")) {
-            chain.doFilter(req, res);
+            System.out.println("🚫 Sin token JWT o formato inválido");
+            res.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 
@@ -61,6 +64,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             System.out.println("⚠️ Error JWT: " + e.getMessage());
             SecurityContextHolder.clearContext();
+            res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
         }
 
         chain.doFilter(req, res);

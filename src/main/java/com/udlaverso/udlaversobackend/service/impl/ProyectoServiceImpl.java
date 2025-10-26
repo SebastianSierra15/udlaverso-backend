@@ -9,7 +9,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.*;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -38,6 +41,69 @@ public class ProyectoServiceImpl implements ProyectoService {
 
         Proyecto guardado = proyectoRepo.save(entity);
         return mapper.toDto(guardado);
+    }
+
+    @Override
+    public ProyectoDTO crearConImagenes(ProyectoDTO dto, MultipartFile hero, List<MultipartFile> galeria) {
+        Proyecto entity = mapper.toEntity(dto);
+
+        if (dto.getCategoriaId() != null) {
+            Categoria cat = categoriaRepo.findById(dto.getCategoriaId())
+                    .orElseThrow(() -> new IllegalArgumentException("Categoría no encontrada"));
+            entity.setCategoriaProyecto(cat);
+        }
+
+        entity.setFechacreacionProyecto(LocalDate.now());
+        entity.setVisualizacionesProyecto(0);
+        entity.setEstadoProyecto((byte) 1);
+        entity.setHerramientasProyecto(dto.getHerramientasProyecto());
+        entity.setPalabrasclaveProyecto(dto.getPalabrasclaveProyecto());
+
+        Proyecto guardado = proyectoRepo.save(entity);
+
+        // Crear carpeta si no existe
+        Path uploadDir = Paths.get("uploads/proyectos/" + guardado.getIdProyecto());
+        try {
+            Files.createDirectories(uploadDir);
+        } catch (IOException e) {
+            throw new RuntimeException("Error al crear directorio de proyecto", e);
+        }
+
+        try {
+            // Guardar imagen principal (sin convertir)
+            String heroNombre = "hero_" + System.currentTimeMillis() + "_" + hero.getOriginalFilename();
+            Path destinoHero = uploadDir.resolve(heroNombre);
+            Files.copy(hero.getInputStream(), destinoHero, StandardCopyOption.REPLACE_EXISTING);
+
+            Imagen heroImg = new Imagen();
+            heroImg.setRutaImagen("/uploads/proyectos/" + guardado.getIdProyecto() + "/" + heroNombre);
+            heroImg.setTipoImagen("hero");
+            heroImg.setProyectoImagen(guardado);
+            guardado.getImagenesProyecto().add(heroImg);
+
+            // Guardar galería (sin convertir)
+            if (galeria != null && !galeria.isEmpty()) {
+                int i = 1;
+                for (MultipartFile file : galeria) {
+                    String fileName = "galeria_" + i + "_" + file.getOriginalFilename();
+                    Path destino = uploadDir.resolve(fileName);
+                    Files.copy(file.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
+
+                    Imagen img = new Imagen();
+                    img.setRutaImagen("/uploads/proyectos/" + guardado.getIdProyecto() + "/" + fileName);
+                    img.setTipoImagen("galeria");
+                    img.setProyectoImagen(guardado);
+                    guardado.getImagenesProyecto().add(img);
+                    i++;
+                }
+            }
+
+            proyectoRepo.save(guardado);
+            return mapper.toDto(guardado);
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error al guardar imágenes del proyecto", e);
+        }
     }
 
     @Override

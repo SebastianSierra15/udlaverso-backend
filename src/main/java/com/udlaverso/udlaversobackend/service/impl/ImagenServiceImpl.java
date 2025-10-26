@@ -36,6 +36,11 @@ public class ImagenServiceImpl implements ImagenService {
 
         Imagen imagen = mapper.toEntity(dto);
         imagen.setProyectoImagen(proyecto);
+
+        // El DTO solo trae la ruta relativa o el nombre del archivo
+        imagen.setRutaImagen(dto.getRutaImagen());
+        imagen.setTipoImagen(dto.getTipoImagen());
+
         Imagen guardada = imagenRepo.save(imagen);
         return mapper.toDto(guardada);
     }
