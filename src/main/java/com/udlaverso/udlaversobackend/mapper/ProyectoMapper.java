@@ -1,18 +1,30 @@
 package com.udlaverso.udlaversobackend.mapper;
 
 import com.udlaverso.udlaversobackend.dto.ProyectoDTO;
+import com.udlaverso.udlaversobackend.entity.Categoria;
 import com.udlaverso.udlaversobackend.entity.Proyecto;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", uses = {ReseniaMapper.class})
 public interface ProyectoMapper {
 
+    // ====== De Entidad a DTO ======
     @Mapping(source = "categoriaProyecto.idCategoria", target = "categoriaId")
     @Mapping(source = "categoriaProyecto.nombreCategoria", target = "categoriaNombre")
     @Mapping(source = "reseniasProyecto", target = "resenias")
     ProyectoDTO toDto(Proyecto proyecto);
 
-    @InheritInverseConfiguration
-    @Mapping(target = "categoriaProyecto", ignore = true)
+    // ====== De DTO a Entidad ======
+    @InheritInverseConfiguration(name = "toDto")
+    @Mapping(target = "categoriaProyecto", expression = "java(mapCategoria(dto.getCategoriaId()))")
+    @Mapping(target = "imagenesProyecto", ignore = true)
     Proyecto toEntity(ProyectoDTO dto);
+
+    // Método auxiliar para construir una categoría mínima con el ID
+    default Categoria mapCategoria(Integer id) {
+        if (id == null) return null;
+        Categoria categoria = new Categoria();
+        categoria.setIdCategoria(id);
+        return categoria;
+    }
 }

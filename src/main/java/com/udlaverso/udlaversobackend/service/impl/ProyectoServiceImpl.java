@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.*;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -58,8 +59,12 @@ public class ProyectoServiceImpl implements ProyectoService {
         entity.setEstadoProyecto((byte) 1);
         entity.setHerramientasProyecto(dto.getHerramientasProyecto());
         entity.setPalabrasclaveProyecto(dto.getPalabrasclaveProyecto());
+        entity.setAutorProyecto(dto.getAutorProyecto());
 
         Proyecto guardado = proyectoRepo.save(entity);
+        if (guardado.getImagenesProyecto() == null) {
+            guardado.setImagenesProyecto(new ArrayList<>());
+        }
 
         // Crear carpeta si no existe
         Path uploadDir = Paths.get("uploads/proyectos/" + guardado.getIdProyecto());

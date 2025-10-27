@@ -37,8 +37,9 @@ public class SecurityConfig {
                                 "/proyectos/**",
                                 "/noticias/**",
                                 "/faqs/**",
-                                "/mail/**"
-                        ).permitAll()
+                                "/mail/**",
+                                "/uploads/**"
+                                ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwt, UsernamePasswordAuthenticationFilter.class);
