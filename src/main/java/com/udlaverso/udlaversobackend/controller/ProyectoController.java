@@ -10,10 +10,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -89,9 +89,60 @@ public class ProyectoController {
         return ResponseEntity.ok(servicio.listarMasVistos(limite));
     }
 
+    @GetMapping("/validar-nombre")
+    public ResponseEntity<Map<String, Object>> validarNombre(
+            @RequestParam String nombre,
+            @RequestParam(required = false) Integer excluirId
+    ) {
+        boolean disponible = servicio.nombreDisponible(nombre, excluirId);
+        return ResponseEntity.ok(Map.of("disponible", disponible));
+    }
+
     @PutMapping("/{id}")
-    public ResponseEntity<ProyectoDTO> actualizar(@PathVariable Integer id, @RequestBody ProyectoDTO dto) {
-        return ResponseEntity.ok(servicio.actualizar(id, dto));
+    public ResponseEntity<ProyectoDTO> actualizar(
+            @PathVariable Integer id,
+            @Validated @RequestBody ProyectoDTO dto,
+            Authentication auth
+    ) {
+        var userDetails = (UserDetails) auth.getPrincipal();
+        var correo = userDetails.getUsername();
+
+        // Buscar el usuario real en la BD con sus permisos
+        Usuario usuario = usuarioRepo.findByCorreoUsuarioConPermisos(correo)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        // Verificar permisos antes de continuar
+        if (!PermisoUtils.tienePermiso(usuario, "editar_proyectos")) {
+            return ResponseEntity.status(403)
+                    .body(null);
+        }
+
+        ProyectoDTO actualizado = servicio.actualizar(id, dto);
+        return ResponseEntity.ok(actualizado);
+    }
+
+    @PutMapping(value = "/{id}/con-imagenes", consumes = {"multipart/form-data"})
+    public ResponseEntity<?> actualizarConImagenes(
+            @PathVariable Integer id,
+            @RequestPart("proyecto") ProyectoDTO dto,
+            @RequestPart(value = "hero", required = false) MultipartFile hero,
+            @RequestPart(value = "galeria", required = false) List<MultipartFile> galeria,
+            @RequestPart(value = "imagenesEliminadas", required = false) String imagenesEliminadasJson,
+            Authentication auth
+    ) {
+        var userDetails = (UserDetails) auth.getPrincipal();
+        var correo = userDetails.getUsername();
+
+        Usuario usuario = usuarioRepo.findByCorreoUsuarioConPermisos(correo)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        if (!PermisoUtils.tienePermiso(usuario, "editar_proyectos")) {
+            return ResponseEntity.status(403)
+                    .body(Map.of("error", "No tiene permiso para editar proyectos"));
+        }
+
+        ProyectoDTO actualizado = servicio.actualizarConImagenes(id, dto, hero, galeria, imagenesEliminadasJson);
+        return ResponseEntity.ok(actualizado);
     }
 
     @DeleteMapping("/{id}")

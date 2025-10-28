@@ -25,6 +25,7 @@ public class ProyectoDTO {
     private Integer visualizacionesProyecto;
     private Byte estadoProyecto;
     private List<ImagenDTO> imagenesProyecto;
+    private List<String> imagenesEliminadas;
     private Integer categoriaId;
     private String categoriaNombre;
     private Double valoracionPromedio;

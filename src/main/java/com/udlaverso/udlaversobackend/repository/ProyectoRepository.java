@@ -22,4 +22,8 @@ public interface ProyectoRepository extends JpaRepository<Proyecto, Integer> {
 
     @Query("SELECT p FROM Proyecto p WHERE p.estadoProyecto = 1 ORDER BY p.visualizacionesProyecto DESC")
     List<Proyecto> findTopProyectosMasVistos(Pageable pageable);
+
+    boolean existsByNombreProyectoIgnoreCase(String nombreProyecto);
+
+    boolean existsByNombreProyectoIgnoreCaseAndIdProyectoNot(String nombreProyecto, Integer idProyecto);
 }

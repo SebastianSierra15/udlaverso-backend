@@ -21,5 +21,9 @@ public interface ProyectoService {
 
     ProyectoDTO actualizar(Integer id, ProyectoDTO dto);
 
+    ProyectoDTO actualizarConImagenes(Integer idProyecto, ProyectoDTO dto, MultipartFile hero, List<MultipartFile> galeria, String imagenesEliminadasJson);
+
     void eliminar(Integer id);
+
+    boolean nombreDisponible(String nombre, Integer excluirId);
 }
