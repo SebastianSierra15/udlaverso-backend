@@ -26,4 +26,16 @@ public interface ProyectoRepository extends JpaRepository<Proyecto, Integer> {
     boolean existsByNombreProyectoIgnoreCase(String nombreProyecto);
 
     boolean existsByNombreProyectoIgnoreCaseAndIdProyectoNot(String nombreProyecto, Integer idProyecto);
+
+    Page<Proyecto> findByEstadoProyectoNot(byte estado, Pageable pageable);
+
+    Page<Proyecto> findByCategoriaProyecto_NombreCategoriaIgnoreCaseAndEstadoProyectoNot(
+            String categoria,
+            byte estado,
+            Pageable pageable);
+
+    Page<Proyecto> findByNombreProyectoContainingIgnoreCaseAndEstadoProyectoNot(
+            String q,
+            byte estado,
+            Pageable pageable);
 }

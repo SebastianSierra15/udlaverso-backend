@@ -118,8 +118,14 @@ public class ProyectoServiceImpl implements ProyectoService {
     @Override
     @Transactional(readOnly = true)
     public ProyectoDTO obtener(Integer id) {
-        return proyectoRepo.findById(id).map(mapper::toDto)
+        Proyecto proyecto = proyectoRepo.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
+
+        if (proyecto.getEstadoProyecto() == 3) {
+            throw new IllegalArgumentException("El proyecto ha sido eliminado");
+        }
+
+        return mapper.toDto(proyecto);
     }
 
     @Override
@@ -128,6 +134,10 @@ public class ProyectoServiceImpl implements ProyectoService {
         Proyecto proyecto = proyectoRepo
                 .findBySlugConResenias(slug)
                 .orElseThrow(() -> new IllegalArgumentException("Proyecto no encontrado"));
+
+        if (proyecto.getEstadoProyecto() == 3) {
+            throw new IllegalArgumentException("El proyecto ha sido eliminado");
+        }
 
         ProyectoDTO dto = mapper.toDto(proyecto);
 
@@ -150,15 +160,14 @@ public class ProyectoServiceImpl implements ProyectoService {
     public Page<ProyectoDTO> listar(String q, String categoria, Pageable pageable) {
         Page<Proyecto> page;
         if (categoria != null && !categoria.isBlank())
-            page = proyectoRepo.findByCategoriaProyecto_NombreCategoriaIgnoreCase(categoria, pageable);
+            page = proyectoRepo.findByCategoriaProyecto_NombreCategoriaIgnoreCaseAndEstadoProyectoNot(categoria, (byte) 3, pageable);
         else if (q != null && !q.isBlank())
-            page = proyectoRepo.findByNombreProyectoContainingIgnoreCase(q, pageable);
+            page = proyectoRepo.findByNombreProyectoContainingIgnoreCaseAndEstadoProyectoNot(q, (byte) 3, pageable);
         else
-            page = proyectoRepo.findAll(pageable);
+            page = proyectoRepo.findByEstadoProyectoNot((byte) 3, pageable);
 
         return page.map(proyecto -> {
             ProyectoDTO dto = mapper.toDto(proyecto);
-            // Calcular el promedio de valoracion
             if (proyecto.getReseniasProyecto() != null && !proyecto.getReseniasProyecto().isEmpty()) {
                 double promedio = proyecto.getReseniasProyecto().stream()
                         .mapToDouble(r -> r.getValoracionResenia())
@@ -171,6 +180,7 @@ public class ProyectoServiceImpl implements ProyectoService {
             return dto;
         });
     }
+
 
     @Override
     public List<ProyectoDTO> listarMasVistos(int limite) {
@@ -369,7 +379,29 @@ public class ProyectoServiceImpl implements ProyectoService {
     }
 
     @Override
-    public void eliminar(Integer id) {
-        proyectoRepo.deleteById(id);
+    @Transactional
+    public void eliminar(Integer idProyecto) {
+        Proyecto proyecto = proyectoRepo.findById(idProyecto)
+                .orElseThrow(() -> new RuntimeException("Proyecto no encontrado"));
+
+        // 🔥 Eliminar físicamente las imágenes asociadas
+        List<Imagen> imagenes = imagenRepo.findByProyectoImagen_IdProyecto(idProyecto);
+        for (Imagen img : imagenes) {
+            try {
+                Path archivo = Paths.get("." + img.getRutaImagen());
+                if (Files.deleteIfExists(archivo)) {
+                    System.out.println("🧩 Imagen eliminada: " + archivo);
+                }
+            } catch (IOException e) {
+                System.err.println("⚠️ No se pudo eliminar imagen: " + img.getRutaImagen());
+            }
+            imagenRepo.delete(img);
+        }
+
+        // Marcar el proyecto como eliminado (estado = 3)
+        proyecto.setEstadoProyecto((byte) 3);
+        proyectoRepo.save(proyecto);
+
+        System.out.println("🚫 Proyecto marcado como eliminado (estado = 3): " + proyecto.getNombreProyecto());
     }
 }
