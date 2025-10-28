@@ -13,6 +13,6 @@ public class NoticiaDTO {
     private String contenidoNoticia;
     private LocalDateTime fechapublicacionNoticia;
     private String autorNoticia;
-    private String ImagenNoticia;
+    private String imagenNoticia;
     private Byte estadoNoticia;
 }

@@ -25,13 +25,13 @@ public class Proyecto {
     @Column(name = "fechacreacion_proyecto")
     private LocalDate fechacreacionProyecto;
 
-    @Column(name = "descripcioncorta_proyecto", length = 500)
+    @Column(name = "descripcioncorta_proyecto", length = 1000)
     private String descripcioncortaProyecto;
 
-    @Column(name = "descripcionlarga_proyecto", length = 2500)
+    @Column(name = "descripcionlarga_proyecto", length = 3500)
     private String descripcionlargaProyecto;
 
-    @Column(name = "objetivo_proyecto", length = 255)
+    @Column(name = "objetivo_proyecto", length = 500)
     private String objetivoProyecto;
 
     @Column(name = "herramientas_proyecto", length = 255)
@@ -43,7 +43,7 @@ public class Proyecto {
     @Column(name = "video_proyecto", length = 255)
     private String videoProyecto;
 
-    @Column(name = "autor_proyecto", length = 150)
+    @Column(name = "autor_proyecto", length = 200)
     private String autorProyecto;
 
     @Column(name = "visualizaciones_proyecto")

@@ -25,10 +25,10 @@ public class Noticia {
     @Column(name = "fechapublicacion_noticia")
     private LocalDateTime fechapublicacionNoticia;
 
-    @Column(name = "autor_noticia", length = 150)
+    @Column(name = "autor_noticia", length = 150, nullable = true)
     private String autorNoticia;
 
-    @Column(name = "imagen_noticia", length = 255)
+    @Column(name = "imagen_noticia", length = 255, nullable = true)
     private String imagenNoticia;
 
     @Column(name = "estado_noticia")
