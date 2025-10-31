@@ -13,6 +13,7 @@ public class ReseniaDTO {
     private Integer valoracionResenia;
     private String comentarioResenia;
     private LocalDateTime fechaResenia;
+    private Integer usuarioId;
     private String usuarioNombres;
     private String usuarioApellidos;
 }

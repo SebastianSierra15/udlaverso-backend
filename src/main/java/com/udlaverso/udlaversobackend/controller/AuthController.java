@@ -35,25 +35,33 @@ public class AuthController {
     @PostMapping("/login")
     public Map<String, Object> login(@RequestBody Map<String, String> body) {
         Authentication auth = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(body.get("correo"), body.get("contrasenia")));
-        var user = usuarioRepo.findByCorreoUsuario(body.get("correo")).orElseThrow();
-        var role = user.getRolUsuario().getNombreRol() != null ? user.getRolUsuario().getNombreRol() : "USER";
+                new UsernamePasswordAuthenticationToken(body.get("correo"), body.get("contrasenia"))
+        );
 
-        // 🧩 Agrega esto:
-        System.out.println("===== LOGIN DEBUG =====");
-        System.out.println("Usuario: " + user.getCorreoUsuario());
-        System.out.println("Rol: " + role);
-        System.out.println("Permisos cargados: " + user.getRolUsuario().getPermisosRol());
-        System.out.println("========================");
+        var user = usuarioRepo.findByCorreoUsuario(body.get("correo"))
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+
+        var role = user.getRolUsuario() != null && user.getRolUsuario().getNombreRol() != null
+                ? user.getRolUsuario().getNombreRol()
+                : "USER";
 
         var permisos = user.getRolUsuario().getPermisosRol()
                 .stream()
                 .map(Permiso::getNombrePermiso)
                 .toList();
 
-        String token = jwt.generate(user.getCorreoUsuario(), role);
-        return Map.of("token", token, "role", role, "permissions", permisos);
+        // Generar el token con el idUsuario incluido
+        String token = jwt.generate(user.getCorreoUsuario(), role, user.getIdUsuario());
+
+        // Incluir también el idUsuario en la respuesta JSON
+        return Map.of(
+                "token", token,
+                "role", role,
+                "permissions", permisos,
+                "idUsuario", user.getIdUsuario()
+        );
     }
+
 
     @PostMapping("/registro")
     public ResponseEntity<?> registro(@Valid @RequestBody RegistroUsuarioDTO dto) {

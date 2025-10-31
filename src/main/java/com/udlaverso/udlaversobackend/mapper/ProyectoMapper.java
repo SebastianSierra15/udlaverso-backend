@@ -20,7 +20,7 @@ public interface ProyectoMapper {
     @Mapping(target = "imagenesProyecto", ignore = true)
     Proyecto toEntity(ProyectoDTO dto);
 
-    // Método auxiliar para construir una categoría mínima con el ID
+    // Metodo auxiliar para construir una categoría mínima con el ID
     default Categoria mapCategoria(Integer id) {
         if (id == null) return null;
         Categoria categoria = new Categoria();
