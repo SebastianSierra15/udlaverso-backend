@@ -40,7 +40,8 @@ public class SecurityConfig {
                                 "/noticias/**",
                                 "/faqs/**",
                                 "/mail/**",
-                                "/uploads/**"
+                                "/uploads/**",
+                                "/analiticas/**"
                         ).permitAll()
                         .requestMatchers("/resenias/**").authenticated()
                         .anyRequest().authenticated()

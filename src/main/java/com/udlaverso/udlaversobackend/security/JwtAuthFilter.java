@@ -30,16 +30,25 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         System.out.println("🔎 URI actual: " + uri + " | Método: " + method);
 
         // === RUTAS PÚBLICAS (solo GET) ===
-        if (method.equalsIgnoreCase("GET") && (
-                uri.startsWith("/proyectos") ||
-                        uri.startsWith("/categorias") ||
-                        uri.startsWith("/noticias") ||
-                        uri.startsWith("/faqs") ||
-                        uri.startsWith("/uploads") ||
-                        uri.startsWith("/swagger-ui") ||
-                        uri.startsWith("/v3/api-docs") ||
-                        uri.startsWith("/resenias/proyecto")
-        ) || uri.startsWith("/auth") || uri.startsWith("/mail")) {
+        // === RUTAS PÚBLICAS (sin validación JWT) ===
+        if (uri.startsWith("/auth") ||
+                uri.startsWith("/mail") ||
+                uri.startsWith("/analiticas") ||          // ✅ incluye todas las analíticas
+                uri.startsWith("/api/docs") ||
+                uri.startsWith("/api/swagger") ||
+                uri.startsWith("/v3/api-docs") ||
+                uri.startsWith("/swagger-ui") ||
+                uri.startsWith("/swagger-ui.html") ||
+                (method.equalsIgnoreCase("GET") && (
+                        uri.startsWith("/proyectos") ||
+                                uri.startsWith("/categorias") ||
+                                uri.startsWith("/noticias") ||
+                                uri.startsWith("/faqs") ||
+                                uri.startsWith("/uploads") ||
+                                uri.startsWith("/resenias/proyecto")
+                ))
+        ) {
+            System.out.println("✅ Ruta pública: " + uri);
             chain.doFilter(req, res);
             return;
         }
