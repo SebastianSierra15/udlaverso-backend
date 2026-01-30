@@ -44,6 +44,7 @@ logs/
 src/main/resources/application.properties
 src/main/resources/application.yml
 src/main/resources/application.yaml
+src/main/resources/application-local.properties
 
 # Archivos de configuración local (variables de entorno, etc.)
 .env
@@ -53,3 +54,6 @@ src/main/resources/application.yaml
 ### OS / Misc ###
 .DS_Store
 Thumbs.db
+
+# Codex AI
+AGENTS.md

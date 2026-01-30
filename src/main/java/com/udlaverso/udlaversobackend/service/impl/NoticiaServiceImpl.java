@@ -5,6 +5,7 @@ import com.udlaverso.udlaversobackend.entity.Noticia;
 import com.udlaverso.udlaversobackend.mapper.NoticiaMapper;
 import com.udlaverso.udlaversobackend.repository.NoticiaRepository;
 import com.udlaverso.udlaversobackend.service.NoticiaService;
+import com.udlaverso.udlaversobackend.util.FileNameUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -99,7 +100,7 @@ public class NoticiaServiceImpl implements NoticiaService {
             Files.createDirectories(uploadDir);
 
             // 6️⃣ Guardar el archivo físicamente
-            String nombreArchivo = "imagen_" + System.currentTimeMillis() + "_" + imagen.getOriginalFilename();
+            String nombreArchivo = "imagen_" + System.currentTimeMillis() + "_" + FileNameUtils.sanitize(imagen.getOriginalFilename());
             Path destino = uploadDir.resolve(nombreArchivo);
             Files.copy(imagen.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
 
@@ -153,7 +154,7 @@ public class NoticiaServiceImpl implements NoticiaService {
                 }
 
                 // Guardar nueva
-                String nombreArchivo = "imagen_" + System.currentTimeMillis() + "_" + imagen.getOriginalFilename();
+                String nombreArchivo = "imagen_" + System.currentTimeMillis() + "_" + FileNameUtils.sanitize(imagen.getOriginalFilename());
                 Path destino = uploadDir.resolve(nombreArchivo);
                 Files.copy(imagen.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
 

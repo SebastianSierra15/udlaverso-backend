@@ -24,6 +24,8 @@ public class VerificacionCorreoServiceImpl implements VerificacionCorreoService 
 
     @Override
     public void enviarCodigo(String correo, String tipo) {
+        LocalDateTime now = LocalDateTime.now();
+        int baseIntentos = 0;
         var ultimo = repo.findTopByCorreoVerificacionCorreoAndTipoVerificacionCorreoOrderByExpiracionVerificacionCorreoDesc(correo, tipo);
 
         // Si ya hay un registro previo, verificamos los límites
@@ -32,21 +34,24 @@ public class VerificacionCorreoServiceImpl implements VerificacionCorreoService 
 
             // Bloqueo activo
             if (anterior.getBloqueoHastaVerificacionCorreo() != null &&
-                    anterior.getBloqueoHastaVerificacionCorreo().isAfter(LocalDateTime.now())) {
+                    anterior.getBloqueoHastaVerificacionCorreo().isAfter(now)) {
                 throw new RuntimeException("Has alcanzado el número máximo de intentos. Intenta nuevamente después de " +
                         anterior.getBloqueoHastaVerificacionCorreo().toLocalTime() + ".");
             }
 
             // Cooldown (1 minuto entre envíos)
             if (anterior.getFechacreacionVerificacionCorreo() != null &&
-                    anterior.getFechacreacionVerificacionCorreo().isAfter(LocalDateTime.now().minusSeconds(60))) {
+                    anterior.getFechacreacionVerificacionCorreo().isAfter(now.minusSeconds(60))) {
                 throw new RuntimeException("Debes esperar al menos 1 minuto antes de solicitar otro código.");
             }
 
             // Incrementar intentos y aplicar bloqueo si excede el límite
-            int intentos = anterior.getIntentosVerificacionCorreo() + 1;
+            boolean dentroVentana = anterior.getFechacreacionVerificacionCorreo() != null
+                    && anterior.getFechacreacionVerificacionCorreo().isAfter(now.minusMinutes(30));
+            baseIntentos = dentroVentana ? anterior.getIntentosVerificacionCorreo() : 0;
+            int intentos = baseIntentos + 1;
             if (intentos > 5) {
-                anterior.setBloqueoHastaVerificacionCorreo(LocalDateTime.now().plusMinutes(15)); // Bloquear 15 min
+                anterior.setBloqueoHastaVerificacionCorreo(now.plusMinutes(15)); // Bloquear 15 min
                 repo.save(anterior);
                 throw new RuntimeException("Has alcanzado el máximo de intentos. Intenta de nuevo más tarde.");
             }
@@ -58,13 +63,11 @@ public class VerificacionCorreoServiceImpl implements VerificacionCorreoService 
         ver.setCorreoVerificacionCorreo(correo);
         ver.setCodigoVerificacionCorreo(codigo);
         ver.setTipoVerificacionCorreo(tipo);
-        ver.setExpiracionVerificacionCorreo(LocalDateTime.now().plusMinutes(10));
+        ver.setExpiracionVerificacionCorreo(now.plusMinutes(10));
         ver.setVerificadoVerificacionCorreo(false);
         ver.setUsadoVerificacionCorreo(false);
-        ver.setFechacreacionVerificacionCorreo(LocalDateTime.now());
-        ver.setIntentosVerificacionCorreo(ultimo.isPresent()
-                ? ultimo.get().getIntentosVerificacionCorreo() + 1
-                : 1);
+        ver.setFechacreacionVerificacionCorreo(now);
+        ver.setIntentosVerificacionCorreo(baseIntentos + 1);
 
         repo.save(ver);
 

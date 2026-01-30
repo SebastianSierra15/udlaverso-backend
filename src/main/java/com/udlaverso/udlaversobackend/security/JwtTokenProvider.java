@@ -37,13 +37,13 @@ public class JwtTokenProvider {
     }
 
     public String getUsername(String token) {
-        return Jwts.parserBuilder().setSigningKey(key).build()
+        return Jwts.parser().setSigningKey(key)
                 .parseClaimsJws(token).getBody().getSubject();
     }
 
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            Jwts.parser().setSigningKey(key).parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException e) {
             System.err.println("Token expirado");

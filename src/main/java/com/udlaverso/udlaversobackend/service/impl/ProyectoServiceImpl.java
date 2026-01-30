@@ -6,6 +6,7 @@ import com.udlaverso.udlaversobackend.entity.*;
 import com.udlaverso.udlaversobackend.mapper.ProyectoMapper;
 import com.udlaverso.udlaversobackend.repository.*;
 import com.udlaverso.udlaversobackend.service.ProyectoService;
+import com.udlaverso.udlaversobackend.util.FileNameUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -80,7 +81,7 @@ public class ProyectoServiceImpl implements ProyectoService {
 
         try {
             // Guardar imagen principal (sin convertir)
-            String heroNombre = "hero_" + System.currentTimeMillis() + "_" + hero.getOriginalFilename();
+            String heroNombre = "hero_" + System.currentTimeMillis() + "_" + FileNameUtils.sanitize(hero.getOriginalFilename());
             Path destinoHero = uploadDir.resolve(heroNombre);
             Files.copy(hero.getInputStream(), destinoHero, StandardCopyOption.REPLACE_EXISTING);
 
@@ -94,7 +95,7 @@ public class ProyectoServiceImpl implements ProyectoService {
             if (galeria != null && !galeria.isEmpty()) {
                 int i = 1;
                 for (MultipartFile file : galeria) {
-                    String fileName = "galeria_" + i + "_" + file.getOriginalFilename();
+                    String fileName = "galeria_" + i + "_" + FileNameUtils.sanitize(file.getOriginalFilename());
                     Path destino = uploadDir.resolve(fileName);
                     Files.copy(file.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
 
@@ -321,7 +322,7 @@ public class ProyectoServiceImpl implements ProyectoService {
             }
 
             try {
-                String heroNombre = "hero_" + System.currentTimeMillis() + "_" + hero.getOriginalFilename();
+                String heroNombre = "hero_" + System.currentTimeMillis() + "_" + FileNameUtils.sanitize(hero.getOriginalFilename());
                 Path destino = uploadDir.resolve(heroNombre);
                 Files.copy(hero.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
 
@@ -341,7 +342,7 @@ public class ProyectoServiceImpl implements ProyectoService {
             int i = 1;
             for (MultipartFile imgFile : galeria) {
                 try {
-                    String fileName = "galeria_" + i + "_" + imgFile.getOriginalFilename();
+                    String fileName = "galeria_" + i + "_" + FileNameUtils.sanitize(imgFile.getOriginalFilename());
                     Path destino = uploadDir.resolve(fileName);
                     Files.copy(imgFile.getInputStream(), destino, StandardCopyOption.REPLACE_EXISTING);
 

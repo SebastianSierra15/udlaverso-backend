@@ -17,6 +17,7 @@ import com.udlaverso.udlaversobackend.service.VerificacionCorreoService;
 import com.udlaverso.udlaversobackend.repository.VerificacionCorreoRepository;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -45,10 +46,12 @@ public class AuthController {
                 ? user.getRolUsuario().getNombreRol()
                 : "USER";
 
-        var permisos = user.getRolUsuario().getPermisosRol()
+        var permisos = (user.getRolUsuario() != null && user.getRolUsuario().getPermisosRol() != null)
+                ? user.getRolUsuario().getPermisosRol()
                 .stream()
                 .map(Permiso::getNombrePermiso)
-                .toList();
+                .toList()
+                : List.of();
 
         // Generar el token con el idUsuario incluido
         String token = jwt.generate(user.getCorreoUsuario(), role, user.getIdUsuario());
